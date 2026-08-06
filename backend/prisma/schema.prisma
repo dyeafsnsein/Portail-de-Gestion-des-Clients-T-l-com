@@ -1,0 +1,105 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ContractStatus {
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum ResourceType {
+  SIM
+  ESIM
+}
+
+enum ResourceStatus {
+  ASSIGNED
+  AVAILABLE
+  BLOCKED
+}
+
+enum ServiceType {
+  INTERNET
+  ROAMING
+  VOLTE
+  SMS
+  OPTION
+}
+
+enum AccessoryCategory {
+  SMARTPHONE
+  CHARGER
+  HEADSET
+  MODEM
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contract {
+  id         String         @id @default(cuid())
+  clientName String
+  status     ContractStatus @default(ACTIVE)
+  type       String
+  startDate  DateTime
+  endDate    DateTime
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  resources  Resource[]
+}
+
+model Resource {
+  id         String         @id @default(cuid())
+  type       ResourceType
+  iccid      String         @unique
+  imsi       String         @unique
+  msisdn     String         @unique
+  status     ResourceStatus @default(AVAILABLE)
+  contractId String?
+  contract   Contract?      @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([contractId])
+}
+
+model Service {
+  id          String      @id @default(cuid())
+  name        String
+  type        ServiceType
+  description String
+  price       Float
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Accessory {
+  id            String            @id @default(cuid())
+  name          String
+  category      AccessoryCategory
+  price         Float
+  stockQuantity Int
+  imageUrl      String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
