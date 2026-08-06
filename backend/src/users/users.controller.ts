@@ -20,6 +20,9 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -37,8 +40,10 @@ import {
   uploadsDir,
 } from '../common/utils/upload.util';
 import { SafeUser } from '../auth/dto/auth-response.dto';
+import { UserResponseDto } from '../auth/dto/auth-response.dto';
 import { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PaginatedUsersResponseDto } from './dto/paginated-users-response.dto';
 import { QueryUsersDto } from './dto/query-users.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -56,18 +61,21 @@ export class UsersController {
   @ApiOperation({
     summary: 'List users with pagination, search and role filter (ADMIN)',
   })
+  @ApiOkResponse({ type: PaginatedUsersResponseDto })
   findAll(@Query() query: QueryUsersDto): Promise<Paginated<SafeUser>> {
     return this.usersService.findAll(query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one user (ADMIN)' })
+  @ApiOkResponse({ type: UserResponseDto })
   findOne(@Param('id') id: string): Promise<SafeUser> {
     return this.usersService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create a user (ADMIN)' })
+  @ApiCreatedResponse({ type: UserResponseDto })
   create(@Body() dto: CreateUserDto): Promise<SafeUser> {
     return this.usersService.create(dto);
   }
@@ -75,6 +83,7 @@ export class UsersController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a user (ADMIN)' })
+  @ApiOkResponse({ type: UserResponseDto })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
@@ -85,6 +94,7 @@ export class UsersController {
   @Patch(':id/reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset a user password (ADMIN)' })
+  @ApiOkResponse({ type: UserResponseDto })
   resetPassword(
     @Param('id') id: string,
     @Body() dto: ResetPasswordDto,
@@ -96,6 +106,7 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a user (ADMIN)' })
+  @ApiNoContentResponse({ description: 'User deleted' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.usersService.remove(id);
   }
@@ -109,6 +120,7 @@ export class UsersController {
     }),
   )
   @ApiOperation({ summary: 'Upload an avatar image for a user (ADMIN)' })
+  @ApiCreatedResponse({ type: UserResponseDto })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

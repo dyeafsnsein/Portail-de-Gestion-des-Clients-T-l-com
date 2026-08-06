@@ -19,6 +19,9 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -37,6 +40,10 @@ import {
   uploadsDir,
 } from '../common/utils/upload.util';
 import { AccessoriesService } from './accessories.service';
+import {
+  AccessoryResponseDto,
+  PaginatedAccessoriesResponseDto,
+} from './dto/accessory-response.dto';
 import { CreateAccessoryDto } from './dto/create-accessory.dto';
 import { QueryAccessoriesDto } from './dto/query-accessories.dto';
 import { UpdateAccessoryDto } from './dto/update-accessory.dto';
@@ -54,6 +61,7 @@ export class AccessoriesController {
     summary:
       'List accessories with pagination, search and category filter (ADMIN)',
   })
+  @ApiOkResponse({ type: PaginatedAccessoriesResponseDto })
   findAll(
     @Query() query: QueryAccessoriesDto,
   ): Promise<Paginated<AccessoryModel>> {
@@ -62,12 +70,14 @@ export class AccessoriesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one accessory (ADMIN)' })
+  @ApiOkResponse({ type: AccessoryResponseDto })
   findOne(@Param('id') id: string): Promise<AccessoryModel> {
     return this.accessoriesService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create an accessory (ADMIN)' })
+  @ApiCreatedResponse({ type: AccessoryResponseDto })
   create(@Body() dto: CreateAccessoryDto): Promise<AccessoryModel> {
     return this.accessoriesService.create(dto);
   }
@@ -75,6 +85,7 @@ export class AccessoriesController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update an accessory (ADMIN)' })
+  @ApiOkResponse({ type: AccessoryResponseDto })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateAccessoryDto,
@@ -85,6 +96,7 @@ export class AccessoriesController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete an accessory (ADMIN)' })
+  @ApiNoContentResponse({ description: 'Accessory deleted' })
   async remove(@Param('id') id: string): Promise<void> {
     await this.accessoriesService.remove(id);
   }
@@ -98,6 +110,7 @@ export class AccessoriesController {
     }),
   )
   @ApiOperation({ summary: 'Upload an image for an accessory (ADMIN)' })
+  @ApiCreatedResponse({ type: AccessoryResponseDto })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

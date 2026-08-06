@@ -11,7 +11,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Role } from '../generated/prisma/enums';
 import type { ResourceModel } from '../generated/prisma/models';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -21,6 +27,10 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { QueryResourcesDto } from './dto/query-resources.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
+import {
+  PaginatedResourcesResponseDto,
+  ResourceResponseDto,
+} from './dto/resource-response.dto';
 import { ResourcesService } from './resources.service';
 
 @ApiTags('resources')
@@ -35,6 +45,7 @@ export class ResourcesController {
   @ApiOperation({
     summary: 'List resources with pagination, search and filters (ADMIN)',
   })
+  @ApiOkResponse({ type: PaginatedResourcesResponseDto })
   findAll(
     @Query() query: QueryResourcesDto,
   ): Promise<Paginated<ResourceModel>> {
@@ -43,12 +54,14 @@ export class ResourcesController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get one resource (ADMIN)' })
+  @ApiOkResponse({ type: ResourceResponseDto })
   findOne(@Param('id') id: string): Promise<ResourceModel> {
     return this.resourcesService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create a resource (ADMIN)' })
+  @ApiCreatedResponse({ type: ResourceResponseDto })
   create(@Body() dto: CreateResourceDto): Promise<ResourceModel> {
     return this.resourcesService.create(dto);
   }
@@ -56,6 +69,7 @@ export class ResourcesController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a resource (ADMIN)' })
+  @ApiOkResponse({ type: ResourceResponseDto })
   update(
     @Param('id') id: string,
     @Body() dto: UpdateResourceDto,
@@ -66,6 +80,7 @@ export class ResourcesController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Soft-delete a resource -> status BLOCKED (ADMIN)' })
+  @ApiOkResponse({ type: ResourceResponseDto })
   remove(@Param('id') id: string): Promise<ResourceModel> {
     return this.resourcesService.remove(id);
   }

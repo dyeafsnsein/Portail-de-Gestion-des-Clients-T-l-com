@@ -14,7 +14,7 @@ export class UserResponseDto {
   @ApiProperty({ enum: Role })
   role: Role;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   avatarUrl: string | null;
 
   @ApiProperty()

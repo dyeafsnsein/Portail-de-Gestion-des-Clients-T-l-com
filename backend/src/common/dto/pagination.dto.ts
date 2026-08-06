@@ -1,6 +1,20 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+
+export class PaginationMetaDto {
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 20 })
+  pageSize: number;
+
+  @ApiProperty({ example: 100 })
+  totalItems: number;
+
+  @ApiProperty({ example: 5 })
+  totalPages: number;
+}
 
 export enum SortDirection {
   ASC = 'asc',
