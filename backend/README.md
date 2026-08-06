@@ -1,98 +1,105 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Portail de Gestion des Clients Télécom
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API du portail de gestion des clients d'un opérateur télécom. Ce service expose une API REST sécurisée (JWT + rôles) permettant d'administrer les **utilisateurs**, les **contrats**, les **ressources** (SIM, lignes...), les **services** et les **accessoires** de la clientèle.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Fonctionnalités
 
-## Description
+- **Authentification** : inscription, connexion, JWT, contrôle d'accès par rôle (admin / utilisateur)
+- **Utilisateurs** : CRUD complet, recherche, pagination, avatar, réinitialisation de mot de passe
+- **Contrats** : CRUD avec suppression logique (soft delete), recherche, filtres
+- **Ressources** : CRUD avec suppression logique, recherche, filtre par contrat, iccid unique
+- **Services** : CRUD, recherche par nom, filtres par type et statut d'activation
+- **Accessoires** : CRUD, filtre par catégorie, téléversement d'image (jpg/png/webp, 2 Mo max)
+- **Documentation API** : Swagger UI interactive
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Stack technique
 
-## Project setup
+| Composant | Technologie |
+|-----------|-------------|
+| Framework | NestJS (Node.js, TypeScript) |
+| ORM | Prisma 7 |
+| Base de données | PostgreSQL 17 (Docker) |
+| Authentification | Passport + JWT, bcrypt |
+| Documentation | @nestjs/swagger |
+| Outils | Docker Compose, ESLint, Prettier |
 
-```bash
-$ npm install
-```
+## Prérequis
 
-## Compile and run the project
+- Node.js 20+
+- Docker Desktop (pour la base de données PostgreSQL)
 
-```bash
-# development
-$ npm run start
+## Installation
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+1. Cloner le dépôt puis se placer dans le dossier `backend` :
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone https://github.com/dyeafsnsein/Portail-de-Gestion-des-Clients-T-l-com.git
+cd Portail-de-Gestion-des-Clients-T-l-com/backend
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+2. Configurer les variables d'environnement :
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cp .env.example .env
+# adapter PORT, DATABASE_URL, JWT_SECRET, SEED_ADMIN_* selon l'environnement
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+3. Démarrer la base de données et l'interface d'administration (Adminer sur `http://localhost:8080`) :
 
-## Resources
+```bash
+docker compose up -d
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+4. Installer les dépendances et préparer la base :
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm install
+npm run prisma:migrate
+npm run db:seed
+```
 
-## Support
+5. Lancer l'API :
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm run start:dev
+```
 
-## Stay in touch
+L'API répond par défaut sur `http://localhost:3000` (configurable via `PORT`).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Scripts utiles
 
-## License
+```bash
+npm run build        # compilation TypeScript
+npm run lint         # lint + auto-fix
+npm run start:dev    # mode watch
+npm run start:prod   # mode production (après build)
+npm run prisma:generate
+npm run db:seed      # seed (compte admin + données de démo)
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Documentation API
+
+La documentation Swagger est disponible sur **`http://localhost:<PORT>/docs`** une fois l'API démarrée.
+
+Un compte admin est créé par le seed à partir des variables `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` du fichier `.env`.
+
+## Structure du projet
+
+```
+backend/
+├── database/
+│   └── schema.sql          # DDL autonome (tables + enums + contraintes)
+├── prisma/
+│   ├── schema.prisma       # Modèles de données
+│   └── seed.ts             # Données de démo
+├── src/
+│   ├── auth/               # Authentification (login, register, JWT)
+│   ├── users/              # Gestion des utilisateurs
+│   ├── contracts/          # Gestion des contrats
+│   ├── resources/          # Gestion des ressources
+│   ├── services/           # Gestion des services
+│   ├── accessories/        # Gestion des accessoires
+│   └── common/             # Guards, filtres, DTO partagés
+├── docker-compose.yml      # PostgreSQL + Adminer
+└── .env.example            # Modèle de configuration
+```
