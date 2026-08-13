@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router';
-import { Bell, ChevronRight, LogOut, Menu, Search, UserRound, Settings as SettingsIcon } from 'lucide-react';
+import { ChevronRight, LogOut, Menu, Search, UserRound, Settings as SettingsIcon } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import Notifications from '@/components/Notifications';
 import { clearAuth, useAuth } from '@/lib/auth';
 import { avatarGradient, initials } from '@/lib/mock';
 import {
@@ -27,13 +27,6 @@ const CRUMBS: Record<string, string> = {
   '/settings': 'Settings',
 };
 
-const NOTIFICATIONS = [
-  { id: 1, title: 'New user registered', body: 'sara.benali@mytt.tn just joined the portal.', time: '4m ago', tone: 'var(--accent)' },
-  { id: 2, title: 'Contract created', body: 'Contract #C-1043 was created for Lumen Field.', time: '22m ago', tone: 'var(--success)' },
-  { id: 3, title: 'Low stock alert', body: 'Charger Ultra-Fast is down to 7 units.', time: '1h ago', tone: 'var(--warning)' },
-  { id: 4, title: 'Contract suspended', body: 'Contract #C-0981 was suspended for non-payment.', time: '3h ago', tone: 'var(--danger)' },
-];
-
 function LiveClock() {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -47,8 +40,6 @@ export default function Topbar({ onMenu, onOpenCommand }: { onMenu: () => void; 
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [notifOpen, setNotifOpen] = useState(false);
-  const [unread, setUnread] = useState(true);
   const crumb = CRUMBS[location.pathname] ?? 'Overview';
 
   const displayName = user?.firstName && user.lastName
@@ -100,43 +91,7 @@ export default function Topbar({ onMenu, onOpenCommand }: { onMenu: () => void; 
         <LiveClock />
 
         {/* Notifications */}
-        <DropdownMenu open={notifOpen} onOpenChange={(v) => { setNotifOpen(v); if (v) setUnread(false); }}>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="relative grid h-9 w-9 place-items-center rounded-md border border-line bg-surface text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink-1"
-            >
-              <Bell size={16} />
-              {unread && <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-danger ring-2 ring-surface" />}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 p-0">
-            <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
-              <span className="text-[13px] font-semibold text-ink-1">Notifications</span>
-              <span className="rounded-pill bg-brand-soft px-2 py-0.5 text-[10px] font-semibold text-brand">4 new</span>
-            </div>
-            <AnimatePresence>
-              {notifOpen &&
-                NOTIFICATIONS.map((n, i) => (
-                  <motion.div
-                    key={n.id}
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04, duration: 0.2 }}
-                    className="flex gap-3 border-b border-line px-4 py-3 last:border-0 hover:bg-surface-2"
-                  >
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: n.tone }} />
-                    <div className="min-w-0">
-                      <div className="text-[13px] font-medium text-ink-1">{n.title}</div>
-                      <div className="text-[12px] leading-4 text-ink-2">{n.body}</div>
-                      <div className="mt-1 font-mono text-[10px] text-ink-3">{n.time}</div>
-                    </div>
-                  </motion.div>
-                ))}
-            </AnimatePresence>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Notifications />
 
         <ThemeToggle />
 

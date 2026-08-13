@@ -231,6 +231,7 @@ export default function ServicesPage() {
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={s.isActive}
+                    onClick={(e) => e.stopPropagation()}
                     onCheckedChange={() => toggleMut.mutate(s)}
                     aria-label={`${s.isActive ? 'Deactivate' : 'Activate'} ${s.name}`}
                     className="h-[18px] w-8 [&_[data-slot=switch-thumb]]:size-3.5"

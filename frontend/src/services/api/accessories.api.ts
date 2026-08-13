@@ -3,7 +3,7 @@
  * Note: imageUrl is NOT part of the create/update payload — images are set
  * server-side via the dedicated POST /accessories/:id/image endpoint.
  */
-import { get, patch, post } from '@/lib/api';
+import { del, get, patch, post } from '@/lib/api';
 import type { Accessory, AccessoryCategory, PageParams, Paginated } from '@/services/types';
 
 export interface ListAccessoriesParams extends PageParams {
@@ -51,4 +51,9 @@ export async function uploadImage(id: string, file: File): Promise<Accessory> {
   return post<Accessory>(`/accessories/${id}/image`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+}
+
+/** Hard-delete an accessory from the catalog. */
+export async function deleteAccessory(id: string): Promise<void> {
+  return del<void>(`/accessories/${id}`);
 }

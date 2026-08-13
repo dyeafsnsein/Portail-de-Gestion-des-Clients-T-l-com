@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ImagePlus, X } from 'lucide-react';
+import { ImagePlus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
+import ConfirmDialog from '@/components/crud/ConfirmDialog';
 import RightDrawer from '@/components/crud/RightDrawer';
 import { FieldLabel } from '@/components/settings/SectionCard';
 import { btnPrimary, btnSecondary, inputCls } from '@/components/settings/bits';
-import { createAccessory, updateAccessory, uploadImage } from '@/services/api/accessories.api';
+import { createAccessory, deleteAccessory, updateAccessory, uploadImage } from '@/services/api/accessories.api';
 import type { Accessory, AccessoryCategory } from '@/services/types';
 import {
   Select,
@@ -34,6 +35,7 @@ export default function AccessoryDrawer({
   const [stock, setStock] = useState('0');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const open = creating || !!accessory;
 
@@ -85,6 +87,16 @@ export default function AccessoryDrawer({
   const uploadMut = useMutation({
     mutationFn: (file: File) => uploadImage(accessory!.id, file),
     onSuccess: (res) => setImageUrl(res.imageUrl),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: () => deleteAccessory(accessory!.id),
+    onSuccess: () => {
+      invalidate();
+      onClose();
+      setConfirmDelete(false);
+      toast.success('Accessory deleted');
+    },
   });
 
   const canSave =
@@ -203,6 +215,28 @@ export default function AccessoryDrawer({
             {saveMut.isPending ? 'Saving…' : accessory ? 'Save changes' : 'Create accessory'}
           </button>
         </div>
+
+        {accessory && (
+          <>
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="flex w-full items-center gap-2 rounded-md border border-danger/30 bg-[rgba(225,29,72,0.05)] px-3 py-2 text-[13px] font-medium text-danger transition-colors duration-150 hover:bg-[rgba(225,29,72,0.10)]"
+            >
+              <Trash2 size={15} />
+              Delete accessory
+            </button>
+            <ConfirmDialog
+              open={confirmDelete}
+              onOpenChange={setConfirmDelete}
+              title="Delete accessory?"
+              description={`${accessory.name} will be removed from the catalog permanently. This cannot be undone.`}
+              confirmLabel="Delete accessory"
+              destructive
+              onConfirm={() => deleteMut.mutate()}
+            />
+          </>
+        )}
       </div>
     </RightDrawer>
   );

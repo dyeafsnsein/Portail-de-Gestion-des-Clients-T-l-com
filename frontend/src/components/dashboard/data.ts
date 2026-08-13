@@ -55,147 +55,115 @@ export interface FeedEntry {
   caption: string;
 }
 
-/** Deterministic telecom activity feed built from the seeded mock data. */
+/** Real activity feed — built from the actual createdAt/updatedAt timestamps of the records already loaded. */
 export function buildActivityFeed(
   contracts: Contract[],
   resources: Resource[],
   services: Service[],
   users: User[],
 ): FeedEntry[] {
-  if (!contracts.length || !resources.length || !services.length || !users.length) return [];
-  const now = Date.now();
-  const minutesAgo = [2, 9, 18, 31, 47, 68, 95, 130, 175, 230, 300, 390, 490, 600];
-  const pick = <T,>(arr: T[], i: number) => arr[(i * 7 + 3) % arr.length];
   const last4 = (s: string) => s.slice(-4);
+  const shortId = (s: string) => s.slice(-8);
+  const entries: FeedEntry[] = [];
 
-  const entries: FeedEntry[] = [
-    {
-      id: 1,
+  let id = 1;
+
+  for (const c of contracts) {
+    const name = clientName(c.client);
+    entries.push({
+      id: id++,
       kind: 'contract',
-      avatarName: clientName(pick(contracts, 0).client),
-      verb: 'created for',
-      object: clientName(pick(contracts, 0).client),
-      at: now - minutesAgo[0] * 60_000,
-      caption: `Contract #${pick(contracts, 0).id} created for ${clientName(pick(contracts, 0).client)}`,
-    },
-    {
-      id: 2,
+      avatarName: name,
+      verb: 'created',
+      object: `Contract #${shortId(c.id)}`,
+      at: new Date(c.createdAt).getTime(),
+      caption: `Contract #${shortId(c.id)} created for ${name}`,
+    });
+    if (c.status === 'SUSPENDED') {
+      entries.push({
+        id: id++,
+        kind: 'alert',
+        avatarName: name,
+        verb: 'suspended',
+        object: `Contract #${shortId(c.id)}`,
+        at: new Date(c.updatedAt).getTime(),
+        caption: `Contract #${shortId(c.id)} suspended for ${name}`,
+      });
+    } else if (c.status === 'TERMINATED') {
+      entries.push({
+        id: id++,
+        kind: 'alert',
+        avatarName: name,
+        verb: 'terminated',
+        object: `Contract #${shortId(c.id)}`,
+        at: new Date(c.updatedAt).getTime(),
+        caption: `Contract #${shortId(c.id)} terminated for ${name}`,
+      });
+    }
+  }
+
+  for (const r of resources) {
+    const c = r.contractId ? contracts.find((x) => x.id === r.contractId)?.client : undefined;
+    const name = c ? clientName(c) : 'Pool';
+    entries.push({
+      id: id++,
       kind: 'resource',
-      avatarName: clientName(pick(contracts, 3).client),
-      verb: 'assigned to',
-      object: `Contract #${pick(contracts, 3).id}`,
-      at: now - minutesAgo[1] * 60_000,
-      caption: `Resource ${pick(resources, 1).type} ···${last4(pick(resources, 1).iccid)} assigned to Contract #${pick(contracts, 3).id}`,
-    },
-    {
-      id: 3,
-      kind: 'service',
-      avatarName: clientName(pick(contracts, 5).client),
-      verb: 'activated on',
-      object: `Contract #${pick(contracts, 5).id}`,
-      at: now - minutesAgo[2] * 60_000,
-      caption: `Service ${pick(services, 2).name} activated on Contract #${pick(contracts, 5).id}`,
-    },
-    {
-      id: 4,
-      kind: 'user',
-      avatarName: pick(users, 4).email.split('@')[0],
-      verb: 'registered as',
-      object: pick(users, 4).role,
-      at: now - minutesAgo[3] * 60_000,
-      caption: `New user ${pick(users, 4).email} registered`,
-    },
-    {
-      id: 5,
-      kind: 'alert',
-      avatarName: clientName(pick(contracts, 8).client),
-      verb: 'suspended',
-      object: `Contract #${pick(contracts, 8).id}`,
-      at: now - minutesAgo[4] * 60_000,
-      caption: `Contract #${pick(contracts, 8).id} suspended for ${clientName(pick(contracts, 8).client)}`,
-    },
-    {
-      id: 6,
-      kind: 'resource',
-      avatarName: clientName(pick(contracts, 2).client),
-      verb: 'blocked',
-      object: last4(pick(resources, 6).iccid),
-      at: now - minutesAgo[5] * 60_000,
-      caption: `Resource ${pick(resources, 6).type} ···${last4(pick(resources, 6).iccid)} blocked`,
-    },
-    {
-      id: 7,
+      avatarName: name,
+      verb: 'added',
+      object: `Resource ${r.type} ···${last4(r.iccid)}`,
+      at: new Date(r.createdAt).getTime(),
+      caption: `Resource ${r.type} ···${last4(r.iccid)} added`,
+    });
+    if (r.status === 'BLOCKED') {
+      entries.push({
+        id: id++,
+        kind: 'alert',
+        avatarName: name,
+        verb: 'blocked',
+        object: `Resource ${r.type} ···${last4(r.iccid)}`,
+        at: new Date(r.updatedAt).getTime(),
+        caption: `Resource ${r.type} ···${last4(r.iccid)} blocked`,
+      });
+    }
+  }
+
+  for (const s of services) {
+    entries.push({
+      id: id++,
       kind: 'service',
       avatarName: 'Catalog',
-      verb: 'added to',
-      object: 'the catalog',
-      at: now - minutesAgo[6] * 60_000,
-      caption: `Service ${pick(services, 7).name} added to the catalog`,
-    },
-    {
-      id: 8,
-      kind: 'contract',
-      avatarName: clientName(pick(contracts, 6).client),
-      verb: 'renewed for',
-      object: clientName(pick(contracts, 6).client),
-      at: now - minutesAgo[7] * 60_000,
-      caption: `Contract #${pick(contracts, 6).id} renewed for ${clientName(pick(contracts, 6).client)}`,
-    },
-    {
-      id: 9,
-      kind: 'user',
-      avatarName: pick(users, 9).email.split('@')[0],
-      verb: 'promoted to',
-      object: 'ADMIN',
-      at: now - minutesAgo[8] * 60_000,
-      caption: `${pick(users, 9).email} promoted to ADMIN`,
-    },
-    {
-      id: 10,
-      kind: 'alert',
-      avatarName: clientName(pick(contracts, 10).client),
-      verb: 'terminated for',
-      object: clientName(pick(contracts, 10).client),
-      at: now - minutesAgo[9] * 60_000,
-      caption: `Contract #${pick(contracts, 10).id} terminated for ${clientName(pick(contracts, 10).client)}`,
-    },
-    {
-      id: 11,
-      kind: 'resource',
-      avatarName: clientName(pick(contracts, 4).client),
-      verb: 'released',
-      object: `msisdn ${pick(resources, 11).msisdn}`,
-      at: now - minutesAgo[10] * 60_000,
-      caption: `Resource ${pick(resources, 11).type} ···${last4(pick(resources, 11).iccid)} released and available`,
-    },
-    {
-      id: 12,
-      kind: 'service',
-      avatarName: 'Catalog',
-      verb: 'deactivated',
-      object: '—',
-      at: now - minutesAgo[11] * 60_000,
-      caption: `Service ${pick(services, 12).name} deactivated`,
-    },
-    {
-      id: 13,
-      kind: 'alert',
-      avatarName: 'Warehouse',
-      verb: 'low on',
-      object: 'stock',
-      at: now - minutesAgo[12] * 60_000,
-      caption: `Stock alert: accessory ${pick(services, 13).name} below 10 units`,
-    },
-    {
-      id: 14,
-      kind: 'contract',
-      avatarName: clientName(pick(contracts, 12).client),
-      verb: 'created for',
-      object: clientName(pick(contracts, 12).client),
-      at: now - minutesAgo[13] * 60_000,
-      caption: `Contract #${pick(contracts, 12).id} created for ${clientName(pick(contracts, 12).client)}`,
-    },
-  ];
+      verb: 'added',
+      object: `Service ${s.name}`,
+      at: new Date(s.createdAt).getTime(),
+      caption: `Service ${s.name} added to the catalog`,
+    });
+    if (!s.isActive) {
+      entries.push({
+        id: id++,
+        kind: 'alert',
+        avatarName: 'Catalog',
+        verb: 'deactivated',
+        object: `Service ${s.name}`,
+        at: new Date(s.updatedAt).getTime(),
+        caption: `Service ${s.name} deactivated`,
+      });
+    }
+  }
 
-  return entries;
+  for (const u of users) {
+    entries.push({
+      id: id++,
+      kind: 'user',
+      avatarName: u.email.split('@')[0],
+      verb: 'registered',
+      object: u.email,
+      at: new Date(u.createdAt).getTime(),
+      caption: `New user ${u.email} registered`,
+    });
+  }
+
+  return entries
+    .filter((e) => Number.isFinite(e.at))
+    .sort((a, b) => b.at - a.at)
+    .slice(0, 14);
 }

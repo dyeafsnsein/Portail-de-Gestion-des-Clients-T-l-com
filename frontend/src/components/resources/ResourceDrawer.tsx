@@ -83,8 +83,10 @@ export default function ResourceDrawer({
     },
   });
 
+  const iccidValid = /^\d{19,20}$/.test(iccid.trim());
+  const imsiValid = /^\d{15}$/.test(imsi.trim());
   const msisdnValid = /^\+216[0-9]{8}$/.test(msisdn.trim());
-  const canSave = iccid.trim().length >= 12 && imsi.trim().length >= 10 && msisdnValid;
+  const canSave = iccidValid && imsiValid && msisdnValid;
   const needsContract = status === 'ASSIGNED';
 
   return (
@@ -133,6 +135,9 @@ export default function ResourceDrawer({
               className={inputCls + ' font-mono'}
             />
           </label>
+          {iccid.trim().length > 0 && !iccidValid && (
+            <p className="text-[11.5px] text-warning">ICCID must be 19-20 digits.</p>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <label className="block">
               <FieldLabel>IMSI</FieldLabel>
@@ -153,6 +158,9 @@ export default function ResourceDrawer({
               />
             </label>
           </div>
+          {imsi.trim().length > 0 && !imsiValid && (
+            <p className="text-[11.5px] text-warning">IMSI must be 15 digits.</p>
+          )}
           <div>
             <FieldLabel>Linked contract</FieldLabel>
             <ContractPicker value={contractId} onChange={setContractId} />
