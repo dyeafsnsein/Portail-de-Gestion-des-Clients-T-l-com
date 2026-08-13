@@ -30,7 +30,10 @@ export class ServicesService {
   async findAll(query: QueryServicesDto): Promise<Paginated<ServiceModel>> {
     const where: ServiceWhereInput = {};
     if (query.search) {
-      where.name = { contains: query.search, mode: 'insensitive' };
+      where.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { description: { contains: query.search, mode: 'insensitive' } },
+      ];
     }
     if (query.type) {
       where.type = query.type;

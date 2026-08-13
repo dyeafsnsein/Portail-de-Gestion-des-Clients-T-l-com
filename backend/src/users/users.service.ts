@@ -29,6 +29,11 @@ const USER_SELECT = {
   email: true,
   role: true,
   avatarUrl: true,
+  firstName: true,
+  lastName: true,
+  phone: true,
+  birthDate: true,
+  address: true,
   createdAt: true,
   updatedAt: true,
 } satisfies UserSelect;
@@ -86,7 +91,16 @@ export class UsersService {
 
     const password = await bcrypt.hash(dto.password, this.bcryptRounds);
     return this.prisma.user.create({
-      data: { email, password, role: dto.role ?? Role.USER },
+      data: {
+        email,
+        password,
+        role: dto.role ?? Role.USER,
+        firstName: dto.firstName?.trim() || null,
+        lastName: dto.lastName?.trim() || null,
+        phone: dto.phone?.trim() || null,
+        birthDate: dto.birthDate ? new Date(dto.birthDate) : null,
+        address: dto.address?.trim() || null,
+      },
       select: USER_SELECT,
     });
   }
@@ -103,6 +117,21 @@ export class UsersService {
     }
     if (dto.password !== undefined) {
       data.password = await bcrypt.hash(dto.password, this.bcryptRounds);
+    }
+    if (dto.firstName !== undefined) {
+      data.firstName = dto.firstName?.trim() || null;
+    }
+    if (dto.lastName !== undefined) {
+      data.lastName = dto.lastName?.trim() || null;
+    }
+    if (dto.phone !== undefined) {
+      data.phone = dto.phone?.trim() || null;
+    }
+    if (dto.birthDate !== undefined) {
+      data.birthDate = dto.birthDate ? new Date(dto.birthDate) : null;
+    }
+    if (dto.address !== undefined) {
+      data.address = dto.address?.trim() || null;
     }
 
     return this.prisma.user.update({

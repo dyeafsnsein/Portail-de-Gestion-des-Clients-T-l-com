@@ -2,7 +2,7 @@
 
 External memory foundation for the backend-only Admin API. Maintained by the lead; update when architecture, flow, or scope changes.
 
-Status: **IMPLEMENTATION COMPLETE** (2026-08-05) — + password reset, SQL deliverable, backend/ restructure (M8–M10), Service module (M11), Accessory module + image upload (M12), full E2E verification (M13), PROJECT_MAP accuracy + Swagger top-level tags (M14), Swagger response schemas + Update DTO bodies + avatarUrl type (M15)
+Status: **IMPLEMENTATION COMPLETE** (2026-08-05) — + password reset, SQL deliverable, backend/ restructure (M8–M10), Service module (M11), Accessory module + image upload (M12), full E2E verification (M13), PROJECT_MAP accuracy + Swagger top-level tags (M14), Swagger response schemas + Update DTO bodies + avatarUrl type (M15), **frontend data-contract reconciliation (M16)**
 
 ---
 
@@ -42,7 +42,7 @@ Protected request                     → Authorization: Bearer <token>
   → RolesGuard: compare role against @Roles() metadata → 403 if mismatch
 ```
 
-### CRUD flow (per entity E ∈ {User, Contract, Resource, Service, Accessory})
+### CRUD flow (per entity E ∈ {User, Contract, Resource, Service, Accessory, Order})
 ```
 POST   /E          create, DTO-validated            (ADMIN)
 GET    /E          list w/ pagination/search/filter (ADMIN)
@@ -50,8 +50,9 @@ GET    /E/:id      single                           (ADMIN)
 PATCH  /E/:id      update, DTO-validated            (ADMIN)
 DELETE /E/:id      delete semantics below           (ADMIN)
 ```
-- Search: `ILIKE %search%` on `email` (User), `clientName` (Contract), `iccid|imsi|msisdn` (Resource), `name` (Service, Accessory).
-- Filters: enum params (`role`, `status`, `type`) + `contractId` (Resource); `type` + `isActive` (Service); `category` (Accessory).
+Orders additionally expose: `POST /orders` (totalAmount computed server-side from items), `GET /orders/recent?limit=` (default 5, max 20), `PATCH /orders/:id/status` (enum-validated).
+- Search: `ILIKE %search%` on `email` (User), related `client` email/firstName/lastName (Contract, Order), `clientId` (Order), `iccid|imsi|msisdn` (Resource), `name|description` (Service), `name` (Accessory).
+- Filters: enum params (`role`, `status`, `type`) + `contractId` (Resource); `type` + `isActive` (Service); `category` (Accessory); `status` (Order).
 - Pagination: `page=1`, `pageSize=20` (cap 100), `sortBy=createdAt`, `sortDir=desc`.
 - Errors: uniform body `{statusCode, error, message, timestamp}` via global exception filter.
 - Upload: `POST /users/:id/avatar` and `POST /accessories/:id/image` — multipart, image/jpeg|png|webp, <=2MB, disk → `./uploads`, url=`/uploads/<file>`, static serve on `/uploads`, re-upload unlinks the previous file. ADMIN-only (all entity endpoints are).
@@ -65,6 +66,7 @@ DELETE /E/:id      delete semantics below           (ADMIN)
 | Resource | **Soft delete** → `status=BLOCKED` (idempotent) |
 | Service | **Hard delete** (204; no status field in spec) |
 | Accessory | **Hard delete** (204; no status field in spec) |
+| Order | **Soft delete** → `status=CANCELLED` (idempotent, 200 + body) |
 
 Soft-deleted rows remain in lists; status is an exposed filterable enum (auditable). No soft-delete for User/Service/Accessory (fixed spec has no status field on them).
 
@@ -94,24 +96,27 @@ backend/                     # repo layout: backend/ now holds the API (frontend
     resources/                # ADMIN CRUD
     services/                 # ADMIN CRUD + search/filter
     accessories/              # ADMIN CRUD + image upload
+    orders/                   # ADMIN CRUD + status tracking + recent
   database/
     schema.sql                # standalone DDL deliverable (no Prisma needed)
   prisma/
-    schema.prisma             # 5 models: User, Contract, Resource, Service, Accessory + enums
-    seed.ts                   # idempotent 1x ADMIN from env
+    schema.prisma             # 7 models: User, Contract, Resource, Service, Accessory, Order, OrderItem + enums
+    seed.ts                   # idempotent: 1 ADMIN from env + 4 clients + contracts + resources + services + accessories + 12 orders
   docker-compose.yml          # services: postgres:17 (telecom-db) + adminer (8080)
   .env / .env.example
   PROJECT_MAP.md
 ```
 
 Entity model:
-- `User`: id, email, password, role(ADMIN|USER), avatarUrl, createdAt, updatedAt
-- `Contract`: id, clientName, status(ACTIVE|SUSPENDED|TERMINATED), type, startDate, endDate, createdAt, updatedAt
-- `Resource`: id, type(SIM|ESIM), iccid, imsi, msisdn, status(ASSIGNED|AVAILABLE|BLOCKED), contractId FK→Contract, createdAt, updatedAt
+- `User`: id, email, password, role(ADMIN|USER), avatarUrl, firstName, lastName, phone, birthDate, address (all optional), createdAt, updatedAt
+- `Contract`: id, clientId FK→User, status(ACTIVE|SUSPENDED|TERMINATED), type, startDate, endDate, createdAt, updatedAt (response embeds `client` summary: id/email/firstName/lastName)
+- `Resource`: id, type(SIM|ESIM), iccid, imsi, msisdn (`+216XXXXXXXX` regex-validated), status(ASSIGNED|AVAILABLE|BLOCKED), contractId FK→Contract, createdAt, updatedAt
 - `Service`: id, name, type(INTERNET|ROAMING|VOLTE|SMS|OPTION), description, price, isActive (default true), createdAt, updatedAt
 - `Accessory`: id, name, category(SMARTPHONE|CHARGER|HEADSET|MODEM), price, stockQuantity, imageUrl (nullable), createdAt, updatedAt
+- `Order`: id, clientId FK→User, status(PENDING|PROCESSING|SHIPPED|DELIVERED|CANCELLED, default PENDING), totalAmount (server-computed Float), createdAt, updatedAt, items[]
+- `OrderItem`: id, orderId FK→Order (CASCADE), itemType(ACCESSORY|SERVICE|RESOURCE), itemName (snapshot), quantity, priceAtPurchase (snapshot), createdAt
 
-Rejected (feature creep / premature abstraction): repository layer, pagination library, CASL/permissions engine, CQRS, third-party logger, "own data scoping" for USER (future Client phase — explicitly out of scope).
+Rejected (feature creep / premature abstraction): repository layer, pagination library, CASL/permissions engine, CQRS, third-party logger, "own data scoping" for USER (all entity endpoints remain ADMIN-only; USER retains register/login only).
 
 ---
 
@@ -121,6 +126,7 @@ Rejected (feature creep / premature abstraction): repository layer, pagination l
 |---|---|---|---|
 | 1 | Password reset flow | **DONE 2026-08-05** | `PATCH /users/:id/reset-password` (ADMIN), `ResetPasswordDto` (min 8), bcrypt-hashed, audit-logged, Swagger documented. Verified end-to-end (old 200 → reset → new 200 / old 401; 400/403/404). |
 | 2 | Standalone SQL creation script | **DONE 2026-08-05** | `backend/database/schema.sql` — full DDL (6 enums, User/Contract/Resource/Service/Accessory, PKs, unique indexes, FK `ON DELETE SET NULL`), mirrors Prisma migrations (init, add_service, add_accessory). Verified by executing in a scratch DB (5 tables, 6 constraints). |
+| 3 | Frontend data-contract reconciliation | **DONE 2026-08-13** | Full 5-phase alignment with the frontend data contract (see M16). Includes a **breaking change**: `Contract.clientName` → `clientId` (FK→User). Regenerated `backend/database/schema.sql` (8 enums, 7 tables, PKs, unique indexes, secondary indexes, 4 FKs) and verified against a scratch DB (7 tables, 28 statements) before dropping it. |
 
 
 ---
@@ -134,6 +140,7 @@ Documentation-only items — no behavioral impact.
 | 1 | Top-level Swagger `tags` array | **FIXED 2026-08-05** — `main.ts` DocumentBuilder now declares `.addTag(...)` for auth/users/contracts/resources/services/accessories (with descriptions), so `/docs` groups are explicit in the OpenAPI document. Verified: 6 tags, 15 paths, summaries/schemas intact, stderr empty. |
 | 2 | Standalone `ServiceType` / `AccessoryCategory` enum schemas | **SKIPPED (cosmetic)** — enum values are inlined in the DTO property schemas (`CreateServiceDto.type`, `CreateAccessoryDto.category`), so Swagger UI and validation already expose all values. Emitting them as standalone named schemas would require editing the DTO decorators (code beyond the Swagger config), so it was deliberately left as-is. |
 | 3 | Response schemas + Update DTO bodies + avatarUrl type | **FIXED 2026-08-06** — all CRUD/upload operations now declare typed response schemas (`@ApiOkResponse`/`@ApiCreatedResponse`/`@ApiNoContentResponse`) via per-entity response DTOs (`*ResponseDto` + `Paginated*ResponseDto` + `PaginationMetaDto`). Update DTOs switched from `@nestjs/mapped-types` to `@nestjs/swagger` `PartialType` so PATCH bodies show their (all-optional) fields. `UserResponseDto.avatarUrl` now typed `string` (nullable). Verified: spec shows schemas on all 27 previously-missing ops, PATCH bodies populated, enums/`string|null` correct, build + lint clean, live PATCH/GET behavior unchanged. |
+| 4 | Contract breaking change `clientName` → `clientId` | **DONE 2026-08-13** — **breaking**: `POST/PATCH /contracts` now require `clientId` (a User id); `clientName` is gone. `ContractResponseDto` embeds a nested `client {id,email,firstName,lastName}` object. Contract search now matches the related user's email/firstName/lastName. Any consumer/frontend still sending `clientName` will get a 400 (`forbidNonWhitelisted`). Live-verified. |
 
 ---
 
@@ -151,6 +158,7 @@ Live tracking of incomplete/unresolved items.
 | 6 | Public register | **RESOLVED 2026-08-05** | `/auth/register` creates USER role (role not client-suppliable). |
 | 7 | Implementation approval | **RESOLVED 2026-08-05** | Approved; M0 in progress. |
 | 8 | Env/JWT secret strength | **RESOLVED 2026-08-05** | 64-char hex JWT_SECRET; .env + .env.example; npm `overrides` pins js-yaml ^5.2.2 (0 vulnerabilities). |
+| 9 | POST /orders access model | **DOCUMENTED 2026-08-13** | POST /orders is currently ADMIN-only as a technical consequence of the whole API being ADMIN-only right now — not a design decision that Admin places orders. No Admin UI was built for order creation, and none is planned. When Client-side backend access is added later, a USER-accessible order creation flow will be built (or this endpoint extended) where clientId is taken from the authenticated user's own JWT, not passed in the request body — that will be the real order-creation path. |
 | M0 | Scaffold + infra | **DONE 2026-08-05** | Nest 11.1.28 scaffold, deps installed, Postgres 17 healthy, `GET /` → 200, `npm run build` clean. |
 | M1 | Prisma schema + migration + seed | **DONE 2026-08-05** | Prisma 7.9.1; client → `src/generated/prisma` (moduleFormat cjs); `prisma.config.ts` with dotenv; 3 tables migrated; ADMIN seeded (bcrypt $2b$10). |
 | M2 | Global plumbing (pipe/filter/pagination/Swagger) | **DONE 2026-08-05** | ValidationPipe (whitelist+forbidNonWhitelisted+transform), HttpExceptionFilter (uniform body, Prisma P2002/P2003/P2025 mapping, level-gated logs), PaginationDto/Paginated/parseSort/paginate, Swagger at /docs + /docs-json, static /uploads, LOG_LEVEL gating, build excludes prisma config. |
@@ -167,3 +175,4 @@ Live tracking of incomplete/unresolved items.
 | M13 | Final verification | **DONE 2026-08-05** | Build + lint clean (0 errors). Avatar + password reset regression pass; smoke: public 200, admin 200, user 403, anon 401; stderr empty. |
 | M14 | Full E2E audit + docs accuracy | **DONE 2026-08-05** | 38-item E2E audit: 37 PASS, 1 FAIL (PROJECT_MAP stale). Fixed all stale entries (items 1–8, see below) and added Swagger top-level tags in `main.ts` (verified: 6 tags, 15 paths, stderr empty). Standalone enum schemas deliberately skipped — see [COSMETIC / MINOR NOTES]. |
 | M15 | Swagger response schemas + update DTO bodies + avatarUrl type | **DONE 2026-08-06** | Final Swagger sanity check flagged 3 real issues, all fixed: (1) Update DTOs (`users/contracts/resources/services/accessories`) switched to `PartialType` from `@nestjs/swagger` — PATCH bodies now show optional fields; (2) response schemas added to all previously-undocumented operations via new response DTOs (`auth/dto` `UserResponseDto`, `common/dto` `PaginationMetaDto`, `users|contracts|resources|services|accessories/dto/*ResponseDto` + `Paginated*ResponseDto`), wired with `@ApiOkResponse`/`@ApiCreatedResponse`/`@ApiNoContentResponse`; (3) `UserResponseDto.avatarUrl` now `@ApiProperty({ type: String, nullable: true })`. Re-verified: `/docs-json` shows schemas on all ops (409/401 error paths remain description-only; 204s bodyless), enums + `string|null` correct, `npm run build` + `npm run lint` clean (0 errors), live PATCH (user role, contract status) + GET + delete regression all unchanged, server restarted from `backend/` on :3000, stderr empty. |
+| M16 | Frontend data-contract reconciliation | **DONE 2026-08-13** | 5-phase alignment with the frontend data contract. (1) **User profile fields**: `firstName`, `lastName`, `phone`, `birthDate`, `address` added to the model, `CreateUserDto`/`UpdateUserDto`/`RegisterDto`/`UserResponseDto`, `USER_SELECT`, with null-clearing supported; migration `20260813171351_add_user_profile_contract_client_and_orders`. (2) **Contract→User relation**: `clientName` → `clientId` FK (breaking), response embeds `client {id,email,firstName,lastName}`, search matches related user email/firstName/lastName; soft-delete retained. (3) **Order/OrderItem module**: new `Order` + `OrderItem` models, `OrderStatus`/`OrderItemType` enums, full ADMIN CRUD + `GET /orders/recent`, `PATCH /orders/:id/status`, `totalAmount` computed server-side, soft delete → CANCELLED, Swagger-tagged `orders`. (4) **Small fixes**: Service search matches name AND description; Resource `msisdn` validated `@Matches(/^\+216[0-9]{8}$/)` → 400 on invalid. (5) **Deliverables**: `schema.sql` regenerated (8 enums, 7 tables) + scratch-DB verified + dropped; PROJECT_MAP updated with the breaking-change note. Seed rewritten (idempotent): 1 admin from env + 4 clients + 5 contracts + 6 resources + 5 services + 4 accessories + 12 orders; DB reset + reseeded. Regression: 25/25 live checks PASS (users profile CRUD + null-clear, contracts nested-client/search/create/patch/soft-delete, resource msisdn 400/200/block, service description search, orders list/filter/search/recent/create-total/detail/status/soft-delete, register-with-profile + login), build + lint clean, server restarted on :3000. NOT committed (awaiting approval). |

@@ -25,7 +25,7 @@ export type AggregateContract = {
 
 export type ContractMinAggregateOutputType = {
   id: string | null
-  clientName: string | null
+  clientId: string | null
   status: $Enums.ContractStatus | null
   type: string | null
   startDate: Date | null
@@ -36,7 +36,7 @@ export type ContractMinAggregateOutputType = {
 
 export type ContractMaxAggregateOutputType = {
   id: string | null
-  clientName: string | null
+  clientId: string | null
   status: $Enums.ContractStatus | null
   type: string | null
   startDate: Date | null
@@ -47,7 +47,7 @@ export type ContractMaxAggregateOutputType = {
 
 export type ContractCountAggregateOutputType = {
   id: number
-  clientName: number
+  clientId: number
   status: number
   type: number
   startDate: number
@@ -60,7 +60,7 @@ export type ContractCountAggregateOutputType = {
 
 export type ContractMinAggregateInputType = {
   id?: true
-  clientName?: true
+  clientId?: true
   status?: true
   type?: true
   startDate?: true
@@ -71,7 +71,7 @@ export type ContractMinAggregateInputType = {
 
 export type ContractMaxAggregateInputType = {
   id?: true
-  clientName?: true
+  clientId?: true
   status?: true
   type?: true
   startDate?: true
@@ -82,7 +82,7 @@ export type ContractMaxAggregateInputType = {
 
 export type ContractCountAggregateInputType = {
   id?: true
-  clientName?: true
+  clientId?: true
   status?: true
   type?: true
   startDate?: true
@@ -166,7 +166,7 @@ export type ContractGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type ContractGroupByOutputType = {
   id: string
-  clientName: string
+  clientId: string
   status: $Enums.ContractStatus
   type: string
   startDate: Date
@@ -198,25 +198,27 @@ export type ContractWhereInput = {
   OR?: Prisma.ContractWhereInput[]
   NOT?: Prisma.ContractWhereInput | Prisma.ContractWhereInput[]
   id?: Prisma.StringFilter<"Contract"> | string
-  clientName?: Prisma.StringFilter<"Contract"> | string
+  clientId?: Prisma.StringFilter<"Contract"> | string
   status?: Prisma.EnumContractStatusFilter<"Contract"> | $Enums.ContractStatus
   type?: Prisma.StringFilter<"Contract"> | string
   startDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   resources?: Prisma.ResourceListRelationFilter
 }
 
 export type ContractOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  clientName?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   type?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  client?: Prisma.UserOrderByWithRelationInput
   resources?: Prisma.ResourceOrderByRelationAggregateInput
 }
 
@@ -225,19 +227,20 @@ export type ContractWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ContractWhereInput | Prisma.ContractWhereInput[]
   OR?: Prisma.ContractWhereInput[]
   NOT?: Prisma.ContractWhereInput | Prisma.ContractWhereInput[]
-  clientName?: Prisma.StringFilter<"Contract"> | string
+  clientId?: Prisma.StringFilter<"Contract"> | string
   status?: Prisma.EnumContractStatusFilter<"Contract"> | $Enums.ContractStatus
   type?: Prisma.StringFilter<"Contract"> | string
   startDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   resources?: Prisma.ResourceListRelationFilter
 }, "id">
 
 export type ContractOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  clientName?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   type?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -254,7 +257,7 @@ export type ContractScalarWhereWithAggregatesInput = {
   OR?: Prisma.ContractScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ContractScalarWhereWithAggregatesInput | Prisma.ContractScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Contract"> | string
-  clientName?: Prisma.StringWithAggregatesFilter<"Contract"> | string
+  clientId?: Prisma.StringWithAggregatesFilter<"Contract"> | string
   status?: Prisma.EnumContractStatusWithAggregatesFilter<"Contract"> | $Enums.ContractStatus
   type?: Prisma.StringWithAggregatesFilter<"Contract"> | string
   startDate?: Prisma.DateTimeWithAggregatesFilter<"Contract"> | Date | string
@@ -265,19 +268,19 @@ export type ContractScalarWhereWithAggregatesInput = {
 
 export type ContractCreateInput = {
   id?: string
-  clientName: string
   status?: $Enums.ContractStatus
   type: string
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  client: Prisma.UserCreateNestedOneWithoutContractsInput
   resources?: Prisma.ResourceCreateNestedManyWithoutContractInput
 }
 
 export type ContractUncheckedCreateInput = {
   id?: string
-  clientName: string
+  clientId: string
   status?: $Enums.ContractStatus
   type: string
   startDate: Date | string
@@ -289,19 +292,19 @@ export type ContractUncheckedCreateInput = {
 
 export type ContractUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  client?: Prisma.UserUpdateOneRequiredWithoutContractsNestedInput
   resources?: Prisma.ResourceUpdateManyWithoutContractNestedInput
 }
 
 export type ContractUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -313,7 +316,7 @@ export type ContractUncheckedUpdateInput = {
 
 export type ContractCreateManyInput = {
   id?: string
-  clientName: string
+  clientId: string
   status?: $Enums.ContractStatus
   type: string
   startDate: Date | string
@@ -324,7 +327,6 @@ export type ContractCreateManyInput = {
 
 export type ContractUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,7 +337,7 @@ export type ContractUpdateManyMutationInput = {
 
 export type ContractUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,9 +346,19 @@ export type ContractUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ContractListRelationFilter = {
+  every?: Prisma.ContractWhereInput
+  some?: Prisma.ContractWhereInput
+  none?: Prisma.ContractWhereInput
+}
+
+export type ContractOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type ContractCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  clientName?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   type?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -357,7 +369,7 @@ export type ContractCountOrderByAggregateInput = {
 
 export type ContractMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  clientName?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   type?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -368,7 +380,7 @@ export type ContractMaxOrderByAggregateInput = {
 
 export type ContractMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  clientName?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   type?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
@@ -380,6 +392,48 @@ export type ContractMinOrderByAggregateInput = {
 export type ContractNullableScalarRelationFilter = {
   is?: Prisma.ContractWhereInput | null
   isNot?: Prisma.ContractWhereInput | null
+}
+
+export type ContractCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput> | Prisma.ContractCreateWithoutClientInput[] | Prisma.ContractUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ContractCreateOrConnectWithoutClientInput | Prisma.ContractCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ContractCreateManyClientInputEnvelope
+  connect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+}
+
+export type ContractUncheckedCreateNestedManyWithoutClientInput = {
+  create?: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput> | Prisma.ContractCreateWithoutClientInput[] | Prisma.ContractUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ContractCreateOrConnectWithoutClientInput | Prisma.ContractCreateOrConnectWithoutClientInput[]
+  createMany?: Prisma.ContractCreateManyClientInputEnvelope
+  connect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+}
+
+export type ContractUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput> | Prisma.ContractCreateWithoutClientInput[] | Prisma.ContractUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ContractCreateOrConnectWithoutClientInput | Prisma.ContractCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ContractUpsertWithWhereUniqueWithoutClientInput | Prisma.ContractUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ContractCreateManyClientInputEnvelope
+  set?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  disconnect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  delete?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  connect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  update?: Prisma.ContractUpdateWithWhereUniqueWithoutClientInput | Prisma.ContractUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ContractUpdateManyWithWhereWithoutClientInput | Prisma.ContractUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ContractScalarWhereInput | Prisma.ContractScalarWhereInput[]
+}
+
+export type ContractUncheckedUpdateManyWithoutClientNestedInput = {
+  create?: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput> | Prisma.ContractCreateWithoutClientInput[] | Prisma.ContractUncheckedCreateWithoutClientInput[]
+  connectOrCreate?: Prisma.ContractCreateOrConnectWithoutClientInput | Prisma.ContractCreateOrConnectWithoutClientInput[]
+  upsert?: Prisma.ContractUpsertWithWhereUniqueWithoutClientInput | Prisma.ContractUpsertWithWhereUniqueWithoutClientInput[]
+  createMany?: Prisma.ContractCreateManyClientInputEnvelope
+  set?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  disconnect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  delete?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  connect?: Prisma.ContractWhereUniqueInput | Prisma.ContractWhereUniqueInput[]
+  update?: Prisma.ContractUpdateWithWhereUniqueWithoutClientInput | Prisma.ContractUpdateWithWhereUniqueWithoutClientInput[]
+  updateMany?: Prisma.ContractUpdateManyWithWhereWithoutClientInput | Prisma.ContractUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ContractScalarWhereInput | Prisma.ContractScalarWhereInput[]
 }
 
 export type EnumContractStatusFieldUpdateOperationsInput = {
@@ -402,20 +456,82 @@ export type ContractUpdateOneWithoutResourcesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ContractUpdateToOneWithWhereWithoutResourcesInput, Prisma.ContractUpdateWithoutResourcesInput>, Prisma.ContractUncheckedUpdateWithoutResourcesInput>
 }
 
-export type ContractCreateWithoutResourcesInput = {
+export type ContractCreateWithoutClientInput = {
   id?: string
-  clientName: string
   status?: $Enums.ContractStatus
   type: string
   startDate: Date | string
   endDate: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  resources?: Prisma.ResourceCreateNestedManyWithoutContractInput
+}
+
+export type ContractUncheckedCreateWithoutClientInput = {
+  id?: string
+  status?: $Enums.ContractStatus
+  type: string
+  startDate: Date | string
+  endDate: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  resources?: Prisma.ResourceUncheckedCreateNestedManyWithoutContractInput
+}
+
+export type ContractCreateOrConnectWithoutClientInput = {
+  where: Prisma.ContractWhereUniqueInput
+  create: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput>
+}
+
+export type ContractCreateManyClientInputEnvelope = {
+  data: Prisma.ContractCreateManyClientInput | Prisma.ContractCreateManyClientInput[]
+  skipDuplicates?: boolean
+}
+
+export type ContractUpsertWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ContractWhereUniqueInput
+  update: Prisma.XOR<Prisma.ContractUpdateWithoutClientInput, Prisma.ContractUncheckedUpdateWithoutClientInput>
+  create: Prisma.XOR<Prisma.ContractCreateWithoutClientInput, Prisma.ContractUncheckedCreateWithoutClientInput>
+}
+
+export type ContractUpdateWithWhereUniqueWithoutClientInput = {
+  where: Prisma.ContractWhereUniqueInput
+  data: Prisma.XOR<Prisma.ContractUpdateWithoutClientInput, Prisma.ContractUncheckedUpdateWithoutClientInput>
+}
+
+export type ContractUpdateManyWithWhereWithoutClientInput = {
+  where: Prisma.ContractScalarWhereInput
+  data: Prisma.XOR<Prisma.ContractUpdateManyMutationInput, Prisma.ContractUncheckedUpdateManyWithoutClientInput>
+}
+
+export type ContractScalarWhereInput = {
+  AND?: Prisma.ContractScalarWhereInput | Prisma.ContractScalarWhereInput[]
+  OR?: Prisma.ContractScalarWhereInput[]
+  NOT?: Prisma.ContractScalarWhereInput | Prisma.ContractScalarWhereInput[]
+  id?: Prisma.StringFilter<"Contract"> | string
+  clientId?: Prisma.StringFilter<"Contract"> | string
+  status?: Prisma.EnumContractStatusFilter<"Contract"> | $Enums.ContractStatus
+  type?: Prisma.StringFilter<"Contract"> | string
+  startDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  endDate?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  createdAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Contract"> | Date | string
+}
+
+export type ContractCreateWithoutResourcesInput = {
+  id?: string
+  status?: $Enums.ContractStatus
+  type: string
+  startDate: Date | string
+  endDate: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  client: Prisma.UserCreateNestedOneWithoutContractsInput
 }
 
 export type ContractUncheckedCreateWithoutResourcesInput = {
   id?: string
-  clientName: string
+  clientId: string
   status?: $Enums.ContractStatus
   type: string
   startDate: Date | string
@@ -442,7 +558,18 @@ export type ContractUpdateToOneWithWhereWithoutResourcesInput = {
 
 export type ContractUpdateWithoutResourcesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  client?: Prisma.UserUpdateOneRequiredWithoutContractsNestedInput
+}
+
+export type ContractUncheckedUpdateWithoutResourcesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -451,9 +578,40 @@ export type ContractUpdateWithoutResourcesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ContractUncheckedUpdateWithoutResourcesInput = {
+export type ContractCreateManyClientInput = {
+  id?: string
+  status?: $Enums.ContractStatus
+  type: string
+  startDate: Date | string
+  endDate: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ContractUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  clientName?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resources?: Prisma.ResourceUpdateManyWithoutContractNestedInput
+}
+
+export type ContractUncheckedUpdateWithoutClientInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  resources?: Prisma.ResourceUncheckedUpdateManyWithoutContractNestedInput
+}
+
+export type ContractUncheckedUpdateManyWithoutClientInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumContractStatusFieldUpdateOperationsInput | $Enums.ContractStatus
   type?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -495,42 +653,45 @@ export type ContractCountOutputTypeCountResourcesArgs<ExtArgs extends runtime.Ty
 
 export type ContractSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  clientName?: boolean
+  clientId?: boolean
   status?: boolean
   type?: boolean
   startDate?: boolean
   endDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   resources?: boolean | Prisma.Contract$resourcesArgs<ExtArgs>
   _count?: boolean | Prisma.ContractCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contract"]>
 
 export type ContractSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  clientName?: boolean
+  clientId?: boolean
   status?: boolean
   type?: boolean
   startDate?: boolean
   endDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contract"]>
 
 export type ContractSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  clientName?: boolean
+  clientId?: boolean
   status?: boolean
   type?: boolean
   startDate?: boolean
   endDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contract"]>
 
 export type ContractSelectScalar = {
   id?: boolean
-  clientName?: boolean
+  clientId?: boolean
   status?: boolean
   type?: boolean
   startDate?: boolean
@@ -539,22 +700,28 @@ export type ContractSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ContractOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientName" | "status" | "type" | "startDate" | "endDate" | "createdAt" | "updatedAt", ExtArgs["result"]["contract"]>
+export type ContractOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "status" | "type" | "startDate" | "endDate" | "createdAt" | "updatedAt", ExtArgs["result"]["contract"]>
 export type ContractInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   resources?: boolean | Prisma.Contract$resourcesArgs<ExtArgs>
   _count?: boolean | Prisma.ContractCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ContractIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ContractIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ContractIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type ContractIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $ContractPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Contract"
   objects: {
+    client: Prisma.$UserPayload<ExtArgs>
     resources: Prisma.$ResourcePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    clientName: string
+    clientId: string
     status: $Enums.ContractStatus
     type: string
     startDate: Date
@@ -955,6 +1122,7 @@ readonly fields: ContractFieldRefs;
  */
 export interface Prisma__ContractClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  client<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   resources<T extends Prisma.Contract$resourcesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contract$resourcesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResourcePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -986,7 +1154,7 @@ export interface Prisma__ContractClient<T, Null = never, ExtArgs extends runtime
  */
 export interface ContractFieldRefs {
   readonly id: Prisma.FieldRef<"Contract", 'String'>
-  readonly clientName: Prisma.FieldRef<"Contract", 'String'>
+  readonly clientId: Prisma.FieldRef<"Contract", 'String'>
   readonly status: Prisma.FieldRef<"Contract", 'ContractStatus'>
   readonly type: Prisma.FieldRef<"Contract", 'String'>
   readonly startDate: Prisma.FieldRef<"Contract", 'DateTime'>
@@ -1247,6 +1415,10 @@ export type ContractCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    */
   data: Prisma.ContractCreateManyInput | Prisma.ContractCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContractIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1317,6 +1489,10 @@ export type ContractUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many Contracts to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContractIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

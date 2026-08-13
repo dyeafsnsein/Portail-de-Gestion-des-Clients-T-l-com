@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MaxLength,
 } from 'class-validator';
 import { ResourceStatus, ResourceType } from '../../generated/prisma/enums';
@@ -25,10 +26,15 @@ export class CreateResourceDto {
   @MaxLength(50)
   imsi: string;
 
-  @ApiProperty({ example: '+31612345678' })
+  @ApiProperty({
+    example: '+21620123456',
+    description: 'Tunisian phone number in +216XXXXXXXX format',
+  })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
+  @Matches(/^\+216[0-9]{8}$/, {
+    message: 'msisdn must match the Tunisian format +216XXXXXXXX',
+  })
   msisdn: string;
 
   @ApiPropertyOptional({ enum: ResourceStatus })

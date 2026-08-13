@@ -53,6 +53,7 @@ async function bootstrap(): Promise<void> {
     .addTag('resources', 'Admin resource management (CRUD, soft delete)')
     .addTag('services', 'Admin service management (CRUD)')
     .addTag('accessories', 'Admin accessory management (CRUD, image upload)')
+    .addTag('orders', 'Admin order management (CRUD, status tracking)')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);

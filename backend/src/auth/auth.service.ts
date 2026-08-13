@@ -30,7 +30,16 @@ export class AuthService {
 
     const password = await bcrypt.hash(dto.password, this.bcryptRounds);
     const user = await this.prisma.user.create({
-      data: { email, password, role: Role.USER },
+      data: {
+        email,
+        password,
+        role: Role.USER,
+        firstName: dto.firstName?.trim() || null,
+        lastName: dto.lastName?.trim() || null,
+        phone: dto.phone?.trim() || null,
+        birthDate: dto.birthDate ? new Date(dto.birthDate) : null,
+        address: dto.address?.trim() || null,
+      },
     });
     return this.buildAuthResponse(user);
   }

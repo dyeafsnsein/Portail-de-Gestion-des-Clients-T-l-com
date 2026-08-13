@@ -5,7 +5,8 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class QueryContractsDto extends PaginationDto {
   @ApiPropertyOptional({
-    description: 'Case-insensitive partial match on clientName',
+    description:
+      'Case-insensitive partial match on the related client email, firstName or lastName',
   })
   @IsOptional()
   @IsString()

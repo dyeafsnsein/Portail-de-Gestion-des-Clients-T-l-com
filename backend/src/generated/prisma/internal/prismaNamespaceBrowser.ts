@@ -54,7 +54,9 @@ export const ModelName = {
   Contract: 'Contract',
   Resource: 'Resource',
   Service: 'Service',
-  Accessory: 'Accessory'
+  Accessory: 'Accessory',
+  Order: 'Order',
+  OrderItem: 'OrderItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -79,6 +81,11 @@ export const UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   avatarUrl: 'avatarUrl',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  phone: 'phone',
+  birthDate: 'birthDate',
+  address: 'address',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -88,7 +95,7 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const ContractScalarFieldEnum = {
   id: 'id',
-  clientName: 'clientName',
+  clientId: 'clientId',
   status: 'status',
   type: 'type',
   startDate: 'startDate',
@@ -141,6 +148,31 @@ export const AccessoryScalarFieldEnum = {
 } as const
 
 export type AccessoryScalarFieldEnum = (typeof AccessoryScalarFieldEnum)[keyof typeof AccessoryScalarFieldEnum]
+
+
+export const OrderScalarFieldEnum = {
+  id: 'id',
+  clientId: 'clientId',
+  status: 'status',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  itemType: 'itemType',
+  itemName: 'itemName',
+  quantity: 'quantity',
+  priceAtPurchase: 'priceAtPurchase',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
 export const SortOrder = {

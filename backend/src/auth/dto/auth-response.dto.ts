@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Role } from '../../generated/prisma/enums';
 import { User } from '../../generated/prisma/client';
 
@@ -16,6 +16,21 @@ export class UserResponseDto {
 
   @ApiProperty({ type: String, nullable: true })
   avatarUrl: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  firstName: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  lastName: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  phone: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  birthDate: Date | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  address: string | null;
 
   @ApiProperty()
   createdAt: Date;

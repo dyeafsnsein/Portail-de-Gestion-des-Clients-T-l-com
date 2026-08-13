@@ -61,3 +61,23 @@ export const AccessoryCategory = {
 } as const
 
 export type AccessoryCategory = (typeof AccessoryCategory)[keyof typeof AccessoryCategory]
+
+
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const OrderItemType = {
+  ACCESSORY: 'ACCESSORY',
+  SERVICE: 'SERVICE',
+  RESOURCE: 'RESOURCE'
+} as const
+
+export type OrderItemType = (typeof OrderItemType)[keyof typeof OrderItemType]

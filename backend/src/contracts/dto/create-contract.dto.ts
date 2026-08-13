@@ -10,11 +10,12 @@ import {
 import { ContractStatus } from '../../generated/prisma/enums';
 
 export class CreateContractDto {
-  @ApiProperty({ example: 'Acme Corp' })
+  @ApiProperty({
+    description: 'ID of the client (User) this contract belongs to',
+  })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(200)
-  clientName: string;
+  clientId: string;
 
   @ApiProperty({ example: 'Postpaid 4G' })
   @IsString()

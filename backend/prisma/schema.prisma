@@ -45,19 +45,41 @@ enum AccessoryCategory {
   MODEM
 }
 
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderItemType {
+  ACCESSORY
+  SERVICE
+  RESOURCE
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
   role      Role     @default(USER)
   avatarUrl String?
+  firstName String?
+  lastName  String?
+  phone     String?
+  birthDate DateTime?
+  address   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  contracts Contract[]
+  orders    Order[]
 }
 
 model Contract {
   id         String         @id @default(cuid())
-  clientName String
+  clientId   String
+  client     User           @relation(fields: [clientId], references: [id], onDelete: Restrict)
   status     ContractStatus @default(ACTIVE)
   type       String
   startDate  DateTime
@@ -65,6 +87,8 @@ model Contract {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   resources  Resource[]
+
+  @@index([clientId])
 }
 
 model Resource {
@@ -102,4 +126,31 @@ model Accessory {
   imageUrl      String?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  clientId    String
+  client      User         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  status      OrderStatus  @default(PENDING)
+  totalAmount Float
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  items       OrderItem[]
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model OrderItem {
+  id              String        @id @default(cuid())
+  orderId         String
+  order           Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemType        OrderItemType
+  itemName        String
+  quantity        Int
+  priceAtPurchase Float
+  createdAt       DateTime      @default(now())
+
+  @@index([orderId])
 }

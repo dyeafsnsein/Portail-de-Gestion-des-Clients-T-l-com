@@ -6,7 +6,7 @@ import { PaginationDto } from '../../common/dto/pagination.dto';
 
 export class QueryServicesDto extends PaginationDto {
   @ApiPropertyOptional({
-    description: 'Case-insensitive partial match on name',
+    description: 'Case-insensitive partial match on name or description',
   })
   @IsOptional()
   @IsString()
