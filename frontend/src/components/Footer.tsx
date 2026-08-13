@@ -5,7 +5,7 @@ export default function Footer() {
       <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-2 text-[12px] text-ink-3">
         <span className="flex items-center gap-2">
           <img src="/logo.svg" alt="" className="h-4 w-4 opacity-70" />
-          MyTT — Telecom Portal · fictional demo data — no real metrics
+          MyTT — Telecom Portal · Admin Back-office
         </span>
         <span className="font-mono text-[11px]">v1.0.0 · Admin Back-office</span>
       </div>
