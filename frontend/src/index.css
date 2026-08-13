@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* MyTT design tokens — light */
+    --bg: #F6F7F9;
+    --surface: #FFFFFF;
+    --surface-2: #F0F2F5;
+    --surface-3: #E7EAEF;
+    --border: #E4E7ED;
+    --border-strong: #D3D8E2;
+    --text-1: #0B1020;
+    --text-2: #566180;
+    --text-3: #8B94AB;
+    --accent: #00A99D;
+    --accent-strong: #008F85;
+    --accent-soft: rgba(0, 169, 157, 0.10);
+    --accent-2: #F7941E;
+    --success: #0EA968;
+    --warning: #D97706;
+    --danger: #E11D48;
+    --info: #0284C7;
+    --shadow-card: 0 1px 2px rgba(16, 24, 40, .05);
+    --shadow-pop: 0 12px 32px -8px rgba(16, 24, 40, .18);
+    --radius: 0.875rem;
+    color-scheme: light;
+  }
+
+  .dark {
+    /* MyTT design tokens — dark */
+    --bg: #090B11;
+    --surface: #10131C;
+    --surface-2: #171B28;
+    --surface-3: #1F2433;
+    --border: #1E2432;
+    --border-strong: #2B3247;
+    --text-1: #F3F5F9;
+    --text-2: #A4AEC4;
+    --text-3: #5E6880;
+    --accent: #1FC2B5;
+    --accent-strong: #00A99D;
+    --accent-soft: rgba(31, 194, 181, 0.14);
+    --accent-2: #FFA93C;
+    --success: #34D399;
+    --warning: #FBBF24;
+    --danger: #FB7185;
+    --info: #38BDF8;
+    --shadow-card: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 24px rgba(0, 0, 0, .35);
+    --shadow-pop: 0 16px 48px rgba(0, 0, 0, .55);
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-canvas text-ink-1 font-sans text-[14px] leading-5;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Theme crossfade — 220ms on themed properties */
+  body, .themed, .themed *, .themed *::before, .themed *::after {
+    transition-property: background-color, color, border-color, fill, stroke;
+    transition-duration: 220ms;
+    transition-timing-function: ease;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--text-1);
+  }
+
+  *:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    outline-offset: 2px;
+  }
+
+  /* Slim scrollbars for app surfaces */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  *::-webkit-scrollbar { width: 8px; height: 8px; }
+  *::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+}
+
+@layer components {
+  /* Card surface per design */
+  .v-card {
+    @apply rounded-lg border border-line bg-surface shadow-card;
+  }
+  .dark .v-card {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 40%);
+  }
+
+  .v-label {
+    @apply text-[11px] font-medium uppercase tracking-[0.04em] text-ink-3;
+  }
+
+  .tnum {
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Skeleton shimmer (1.6s sweep) */
+  .v-skeleton {
+    @apply rounded-md;
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  /* Live emerald pulse dot */
+  .v-live-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--success);
+  }
+  .v-live-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: var(--success);
+    animation: live-pulse 2s ease-out infinite;
+  }
+
+  /* Brand primary gradient — teal, for buttons / avatars / CTAs */
+  .v-brand-gradient {
+    background-image: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  }
+
+  /* Full brand spectrum (TT teardrop) — logo marks only */
+  .v-rainbow-gradient {
+    background-image: linear-gradient(
+      135deg,
+      #00A99D 0%,
+      #7AC143 18%,
+      #F5C400 36%,
+      #F7941E 52%,
+      #E4007E 68%,
+      #8E3BB3 84%,
+      #2F6FE0 100%
+    );
+  }
+
+  /* Aurora backdrop (login hero) — subtle brand-coloured wash */
+  .v-aurora {
+    position: relative;
+    overflow: hidden;
+  }
+  .v-aurora::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+      radial-gradient(38% 42% at 24% 30%, rgba(0, 169, 157, 0.38), transparent 70%),
+      radial-gradient(30% 34% at 58% 22%, rgba(122, 193, 67, 0.26), transparent 70%),
+      radial-gradient(34% 38% at 76% 46%, rgba(247, 148, 30, 0.3), transparent 70%),
+      radial-gradient(30% 36% at 50% 84%, rgba(232, 0, 126, 0.2), transparent 70%);
+    filter: blur(80px);
+    animation: aurora-drift 24s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+}
+
+@keyframes aurora-drift {
+  0%   { transform: translate3d(-3%, -2%, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(3%, 2%, 0) rotate(4deg) scale(1.06); }
+  100% { transform: translate3d(-2%, 3%, 0) rotate(-3deg) scale(1.02); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-live-dot::after, .v-aurora::before { animation: none; }
+  .v-skeleton { animation: none; }
+}

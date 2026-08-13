@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="MyTT logo">
+  <defs>
+    <linearGradient id="tt-drop" x1="16" y1="6" x2="50" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00A99D"/>
+      <stop offset="0.2" stop-color="#7AC143"/>
+      <stop offset="0.4" stop-color="#F5C400"/>
+      <stop offset="0.56" stop-color="#F7941E"/>
+      <stop offset="0.72" stop-color="#E4007E"/>
+      <stop offset="0.88" stop-color="#8E3BB3"/>
+      <stop offset="1" stop-color="#2F6FE0"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 3.5C45.5 17.5 52 28.5 52 42.5c0 10.5-8.9 18.5-20 18.5S12 53 12 42.5C12 28.5 18.5 17.5 32 3.5Z" fill="url(#tt-drop)"/>
+  <g fill="#FFFFFF">
+    <rect x="17.5" y="27" width="13" height="5.5" rx="2.5"/>
+    <rect x="21.5" y="27" width="5.5" height="19" rx="2.5"/>
+    <rect x="33.5" y="27" width="13" height="5.5" rx="2.5"/>
+    <rect x="37.5" y="27" width="5.5" height="19" rx="2.5"/>
+  </g>
+  <circle cx="48" cy="13.5" r="2.6" fill="#FFFFFF"/>
+</svg>
